@@ -1,6 +1,6 @@
 {
-  "installCommand": "corepack enable && corepack prepare pnpm@9.1.0 --activate && pnpm install --no-frozen-lockfile",
-  "buildCommand": "pnpm exec prisma generate --schema=packages/database/prisma/schema.prisma && pnpm exec prisma db push --schema=packages/database/prisma/schema.prisma --accept-data-loss && pnpm --filter @qt/web run build",
+  "installCommand": "bun install",
+  "buildCommand": "bunx prisma generate --schema=packages/database/prisma/schema.prisma && bunx prisma db push --schema=packages/database/prisma/schema.prisma --accept-data-loss && cd apps/web && bunx next build",
   "outputDirectory": "apps/web/.next",
   "framework": "nextjs"
 }
