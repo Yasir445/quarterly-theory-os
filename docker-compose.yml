@@ -1,0 +1,34 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: qt-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: qt
+      POSTGRES_PASSWORD: qt_dev_password
+      POSTGRES_DB: quarterly_theory
+    ports:
+      - "5432:5432"
+    volumes:
+      - qt_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U qt -d quarterly_theory"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: qt-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - qt_redis_data:/data
+    # Used for rate limiting (see apps/web/lib/rate-limit.ts) and future job queues.
+
+volumes:
+  qt_postgres_data:
+  qt_redis_data:

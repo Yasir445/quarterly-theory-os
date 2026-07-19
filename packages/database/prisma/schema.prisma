@@ -1,0 +1,119 @@
+// ─────────────────────────────────────────────────────────────
+// Quarterly Theory OS — Database Schema
+// Package: @qt/database
+//
+// This file is built incrementally, module by module, alongside
+// the application. Each section is owned by the feature module
+// named in its header comment. Do not add fields to a model
+// outside of its owning module's migration without discussion —
+// this keeps schema changes reviewable and traceable to a feature.
+// ─────────────────────────────────────────────────────────────
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearchPostgres"]
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ═════════════════════════════════════════════════════════════
+// MODULE: Authentication (apps/web/features/auth)
+// ═════════════════════════════════════════════════════════════
+
+enum Role {
+  USER
+  MODERATOR
+  ADMIN
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+
+  /// Null for OAuth-only accounts. Hashed with bcrypt (see lib/password.ts).
+  passwordHash String?
+
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  accounts Account[]
+  sessions Session[]
+
+  // Reverse relations for future modules are added as those modules land
+  // (Subscription, JournalTrade, ResearchNote, LessonProgress, etc.)
+
+  @@index([email])
+  @@map("users")
+}
+
+/// Auth.js standard "Account" model — one row per linked OAuth/credentials provider.
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+  @@map("accounts")
+}
+
+/// Database session strategy (not JWT) — chosen deliberately so admins can
+/// force-revoke a session immediately (e.g. on suspension or password reset),
+/// which a stateless JWT cannot support without an extra revocation list.
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+/// Auth.js standard verification token — reused here for both email
+/// verification and password-reset flows, disambiguated by `identifier`
+/// prefix (see features/auth/services/auth.service.ts).
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// ═════════════════════════════════════════════════════════════
+// Modules below this line are scaffolded as we build each one.
+// Placeholder comments mark what's coming so the schema's final
+// shape is visible up front, per the architecture plan:
+//
+//   MODULE: Billing            -> Subscription, Invoice
+//   MODULE: Knowledge Library  -> Lesson, LessonRevision, Tag, LessonProgress, GlossaryTerm
+//   MODULE: Research           -> ResearchFolder, ResearchNote
+//   MODULE: Trade Journal      -> JournalTrade, TradeScreenshot, TradeTag
+//   MODULE: Backtesting        -> BacktestSession
+//   MODULE: Economic Calendar  -> EconomicEvent
+//   MODULE: Notifications      -> Notification
+//   MODULE: Admin/Audit        -> AuditLog
+// ═════════════════════════════════════════════════════════════
