@@ -1,6 +1,6 @@
 {
   "installCommand": "bun install",
-  "buildCommand": "bunx prisma generate --schema=packages/database/prisma/schema.prisma && bunx prisma db push --schema=packages/database/prisma/schema.prisma --accept-data-loss && cd apps/web && bunx next build",
+  "buildCommand": "bunx prisma@5.16.1 generate --schema=packages/database/prisma/schema.prisma && bunx prisma@5.16.1 db push --schema=packages/database/prisma/schema.prisma --accept-data-loss && cd apps/web && bunx next build",
   "outputDirectory": "apps/web/.next",
   "framework": "nextjs"
 }
