@@ -3,6 +3,10 @@
   "private": true,
   "version": "0.1.0",
   "description": "Quarterly Theory OS — a production SaaS platform for Quarterly Theory traders (learning, research, journaling, backtesting).",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "packageManager": "pnpm@9.1.0",
   "engines": {
     "node": ">=20.0.0"
