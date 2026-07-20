@@ -2,22 +2,16 @@
   "name": "quarterly-theory-os",
   "private": true,
   "version": "0.1.0",
-  "description": "Quarterly Theory OS — a production SaaS platform for Quarterly Theory traders (learning, research, journaling, backtesting).",
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
+  "description": "Quarterly Theory OS",
+  "workspaces": ["apps/*", "packages/*"],
   "packageManager": "pnpm@9.1.0",
-  "engines": {
-    "node": ">=20.0.0"
-  },
+  "engines": { "node": ">=20.0.0" },
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
-    "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",
     "db:generate": "pnpm --filter @qt/database db:generate",
     "db:push": "pnpm --filter @qt/database db:push",
     "db:migrate": "pnpm --filter @qt/database db:migrate",
@@ -27,6 +21,7 @@
   "devDependencies": {
     "turbo": "^2.0.6",
     "prettier": "^3.3.2",
-    "typescript": "^5.5.3"
+    "typescript": "^5.5.3",
+    "next": "14.2.5"
   }
 }
