@@ -17,7 +17,6 @@ function hasSessionCookie(req: NextRequest) {
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const isAuthed = hasSessionCookie(req);
-
   const isAuthRoute = AUTH_ROUTES.some((r) => pathname.startsWith(r));
   const isProtectedRoute = PROTECTED_PREFIXES.some((r) => pathname.startsWith(r));
 
